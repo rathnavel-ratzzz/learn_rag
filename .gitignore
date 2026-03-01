@@ -9998,3 +9998,9 @@ venv/lib/python3.12/site-packages/opentelemetry/sdk/trace/_sampling_experimental
 venv/lib/python3.12/site-packages/opentelemetry/sdk/trace/_sampling_experimental/__pycache__/__init__.cpython-312.pyc
 venv/lib/python3.12/site-packages/opentelemetry/sdk/trace/_sampling_experimental/__pycache__/_always_off.cpython-312.pyc
 venv/lib/python3.12/site-packages/six.py
+requirements.txt
+chroma_db4/chroma.sqlite3
+chroma_db4/f15d71c0-b34d-46d9-a576-d4be9982f1ce/data_level0.bin
+chroma_db4/f15d71c0-b34d-46d9-a576-d4be9982f1ce/header.bin
+chroma_db4/f15d71c0-b34d-46d9-a576-d4be9982f1ce/length.bin
+chroma_db4/f15d71c0-b34d-46d9-a576-d4be9982f1ce/link_lists.bin
