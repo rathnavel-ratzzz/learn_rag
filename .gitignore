@@ -14,6 +14,7 @@ chroma_db3/3565d14b-c4d0-4f0b-8c21-6b0f6b3242ea/header.bin
 chroma_db3/3565d14b-c4d0-4f0b-8c21-6b0f6b3242ea/length.bin
 chroma_db3/3565d14b-c4d0-4f0b-8c21-6b0f6b3242ea/link_lists.bin
 venv/*
+venv/
 venv/bin/activate
 venv/bin/activate.csh
 venv/bin/activate.fish
