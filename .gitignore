@@ -1,4 +1,4 @@
-chroma_db/chroma.sqlite3
+chroma_db*
 chroma_db/5ea3071a-126a-4349-a7ee-30ee35dc48b6/data_level0.bin
 chroma_db/5ea3071a-126a-4349-a7ee-30ee35dc48b6/header.bin
 chroma_db/5ea3071a-126a-4349-a7ee-30ee35dc48b6/length.bin
