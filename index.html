@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AskMyDoc</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --border: #e0ddd6;
+    --text: #1a1a1a;
+    --muted: #888880;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --ai-bg: #f0f0eb;
+    --user-bg: #2563eb;
+    --danger: #dc2626;
+    --success: #16a34a;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .logo span { color: var(--accent); }
+
+  .doc-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .status-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .status-dot.ready { background: var(--success); }
+  .status-dot.loading { background: #f59e0b; animation: pulse 1s infinite; }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* ── Layout ── */
+  .layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  /* Upload area */
+  .upload-area {
+    border: 1.5px dashed var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg);
+  }
+
+  .upload-area:hover, .upload-area.dragover {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .upload-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .upload-area p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .upload-area p strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  #file-input { display: none; }
+
+  /* File list */
+  .file-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--bg);
+    border-radius: 6px;
+    font-size: 0.8rem;
+  }
+
+  .file-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .file-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+  }
+
+  .file-remove {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 2px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .file-remove:hover { color: var(--danger); background: #fef2f2; }
+
+  /* Process button */
+  .btn-process {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.2s;
+  }
+  .btn-process:hover { background: #1d4ed8; }
+  .btn-process:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+
+  /* Clear button */
+  .btn-clear {
+    width: 100%;
+    padding: 8px;
+    background: none;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: all 0.2s;
+  }
+  .btn-clear:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* ── Chat area ── */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
+
+  /* Empty state */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-align: center;
+    gap: 12px;
+    padding: 40px;
+  }
+
+  .empty-state .big-icon { font-size: 3rem; opacity: 0.4; }
+  .empty-state h3 { font-size: 1rem; font-weight: 500; color: var(--text); opacity: 0.6; }
+  .empty-state p { font-size: 0.85rem; max-width: 300px; line-height: 1.6; }
+
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+
+  .suggestion {
+    padding: 6px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .suggestion:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Messages */
+  .message {
+    display: flex;
+    gap: 12px;
+    max-width: 720px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .message.user { align-self: flex-end; flex-direction: row-reverse; }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+  }
+
+  .message.ai .avatar { background: var(--ai-bg); color: var(--text); }
+  .message.user .avatar { background: var(--user-bg); color: white; }
+
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    max-width: 600px;
+  }
+
+  .message.ai .bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top-left-radius: 2px;
+  }
+
+  .message.user .bubble {
+    background: var(--user-bg);
+    color: white;
+    border-top-right-radius: 2px;
+  }
+
+  .source-tag {
+    margin-top: 8px;
+    padding: 4px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    display: inline-block;
+  }
+
+  /* Typing indicator */
+  .typing .bubble {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 14px 16px;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+  /* ── Input bar ── */
+  .input-bar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .input-wrapper {
+    flex: 1;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: flex-end;
+    padding: 10px 14px;
+    transition: border-color 0.2s;
+    gap: 10px;
+  }
+  .input-wrapper:focus-within { border-color: var(--accent); }
+
+  #question-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    resize: none;
+    max-height: 120px;
+    line-height: 1.5;
+  }
+
+  #question-input::placeholder { color: var(--muted); }
+
+  .btn-send {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border: none;
+    border-radius: 7px;
+    color: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    font-size: 1rem;
+  }
+  .btn-send:hover { background: #1d4ed8; }
+  .btn-send:disabled { background: var(--border); cursor: not-allowed; }
+
+  /* Progress bar */
+  .progress-bar {
+    height: 3px;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.3s;
+    position: fixed;
+    top: 0; left: 0;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: none; }
+  .toast.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: var(--success); }
+  .toast.error { background: #fef2f2; border: 1px solid #fecaca; color: var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+
+<header>
+  <div class="logo">ask<span>my</span>doc</div>
+  <div class="doc-status">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">no documents loaded</span>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Documents</div>
+
+      <div class="upload-area" id="upload-area">
+        <div class="upload-icon">📄</div>
+        <p><strong>Click to upload</strong> or drag & drop<br>PDF or TXT files</p>
+      </div>
+      <input type="file" id="file-input" multiple accept=".pdf,.txt">
+
+      <div class="file-list" id="file-list" style="margin-top:12px;"></div>
+
+      <button class="btn-process" id="btn-process" disabled>
+        Process Documents
+      </button>
+      <button class="btn-clear" id="btn-clear">
+        Clear & Reset
+      </button>
+    </div>
+  </aside>
+
+  <!-- Chat -->
+  <main class="chat-area">
+    <div class="messages" id="messages">
+      <div class="empty-state" id="empty-state">
+        <div class="big-icon">💬</div>
+        <h3>Ask anything about your documents</h3>
+        <p>Upload PDFs or text files on the left, then ask questions here.</p>
+        <div class="suggestions">
+          <div class="suggestion" onclick="useSuggestion(this)">Summarize the document</div>
+          <div class="suggestion" onclick="useSuggestion(this)">What are the main topics?</div>
+          <div class="suggestion" onclick="useSuggestion(this)">List key concepts</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-wrapper">
+        <textarea id="question-input" placeholder="Ask a question about your documents..." rows="1"></textarea>
+        <button class="btn-send" id="btn-send" disabled title="Send">➤</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── State ──────────────────────────────────────────────
+  let files = [];
+  let isProcessed = false;
+  let isLoading = false;
+
+  // ── Elements ───────────────────────────────────────────
+  const uploadArea = document.getElementById('upload-area');
+  const fileInput = document.getElementById('file-input');
+  const fileList = document.getElementById('file-list');
+  const btnProcess = document.getElementById('btn-process');
+  const btnClear = document.getElementById('btn-clear');
+  const messages = document.getElementById('messages');
+  const emptyState = document.getElementById('empty-state');
+  const input = document.getElementById('question-input');
+  const btnSend = document.getElementById('btn-send');
+  const statusDot = document.getElementById('status-dot');
+  const statusText = document.getElementById('status-text');
+  const progress = document.getElementById('progress');
+
+  // ── Upload ─────────────────────────────────────────────
+  uploadArea.onclick = () => fileInput.click();
+
+  fileInput.onchange = (e) => addFiles(Array.from(e.target.files));
+
+  uploadArea.ondragover = (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); };
+  uploadArea.ondragleave = () => uploadArea.classList.remove('dragover');
+  uploadArea.ondrop = (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+    addFiles(Array.from(e.dataTransfer.files));
+  };
+
+  function addFiles(newFiles) {
+    newFiles.forEach(f => {
+      if (!files.find(x => x.name === f.name)) {
+        files.push(f);
+      }
+    });
+    renderFileList();
+    btnProcess.disabled = files.length === 0;
+    isProcessed = false;
+    updateStatus('dot', '');
+    updateStatus('text', `${files.length} file(s) ready to process`);
+  }
+
+  function renderFileList() {
+    fileList.innerHTML = '';
+    files.forEach((f, i) => {
+      const icon = f.name.endsWith('.pdf') ? '📕' : '📄';
+      const item = document.createElement('div');
+      item.className = 'file-item';
+      item.innerHTML = `
+        <span class="file-icon">${icon}</span>
+        <span class="file-name">${f.name}</span>
+        <button class="file-remove" onclick="removeFile(${i})" title="Remove">✕</button>
+      `;
+      fileList.appendChild(item);
+    });
+  }
+
+  function removeFile(i) {
+    files.splice(i, 1);
+    renderFileList();
+    btnProcess.disabled = files.length === 0;
+    if (files.length === 0) updateStatus('text', 'no documents loaded');
+  }
+
+  // ── Process ────────────────────────────────────────────
+  btnProcess.onclick = async () => {
+    if (files.length === 0) return;
+
+    btnProcess.disabled = true;
+    btnProcess.textContent = 'Processing...';
+    updateStatus('dot', 'loading');
+    updateStatus('text', 'processing documents...');
+    setProgress(20);
+
+    const formData = new FormData();
+    files.forEach(f => formData.append('files', f));
+
+    try {
+      const res = await fetch('/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      if (data.success) {
+        isProcessed = true;
+        btnSend.disabled = false;
+        input.disabled = false;
+        updateStatus('dot', 'ready');
+        updateStatus('text', `${data.chunks} chunks from ${files.length} file(s)`);
+        btnProcess.textContent = '✓ Processed';
+        setProgress(100);
+        setTimeout(() => setProgress(0), 500);
+        showToast(`Loaded ${data.chunks} chunks successfully!`, 'success');
+        input.focus();
+      } else {
+        throw new Error(data.error || 'Processing failed');
+      }
+    } catch (err) {
+      showToast(err.message, 'error');
+      btnProcess.disabled = false;
+      btnProcess.textContent = 'Process Documents';
+      updateStatus('dot', '');
+      updateStatus('text', 'processing failed');
+      setProgress(0);
+    }
+  };
+
+  // ── Clear ──────────────────────────────────────────────
+  btnClear.onclick = async () => {
+    await fetch('/clear', { method: 'POST' });
+    files = [];
+    isProcessed = false;
+    renderFileList();
+    btnProcess.disabled = true;
+    btnProcess.textContent = 'Process Documents';
+    btnSend.disabled = true;
+    input.disabled = false;
+    updateStatus('dot', '');
+    updateStatus('text', 'no documents loaded');
+    messages.innerHTML = '';
+    messages.appendChild(emptyState);
+    emptyState.style.display = 'flex';
+    showToast('Cleared!', 'success');
+  };
+
+  // ── Chat ───────────────────────────────────────────────
+  input.oninput = function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  };
+
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  btnSend.onclick = sendMessage;
+
+  async function sendMessage() {
+    const q = input.value.trim();
+    if (!q || isLoading || !isProcessed) return;
+
+    isLoading = true;
+    btnSend.disabled = true;
+
+    hideEmpty();
+    addMessage('user', q);
+    input.value = '';
+    input.style.height = 'auto';
+
+    const typing = addTyping();
+
+    try {
+      const res = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q })
+      });
+      const data = await res.json();
+      typing.remove();
+
+      if (data.answer) {
+        addMessage('ai', data.answer, data.source);
+      } else {
+        addMessage('ai', 'Sorry, I could not find an answer in the documents.');
+      }
+    } catch (err) {
+      typing.remove();
+      addMessage('ai', 'Error connecting to server. Is Flask running?');
+    }
+
+    isLoading = false;
+    btnSend.disabled = false;
+    input.focus();
+  }
+
+  function addMessage(role, text, source) {
+    const msg = document.createElement('div');
+    msg.className = `message ${role}`;
+
+    const sourceTag = source ? `<div class="source-tag">📄 ${source}</div>` : '';
+
+    msg.innerHTML = `
+      <div class="avatar">${role === 'ai' ? 'AI' : 'U'}</div>
+      <div class="bubble">${text.replace(/\n/g, '<br>')}${sourceTag}</div>
+    `;
+    messages.appendChild(msg);
+    messages.scrollTop = messages.scrollHeight;
+    return msg;
+  }
+
+  function addTyping() {
+    const msg = document.createElement('div');
+    msg.className = 'message ai typing';
+    msg.innerHTML = `
+      <div class="avatar">AI</div>
+      <div class="bubble">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+      </div>
+    `;
+    messages.appendChild(msg);
+    messages.scrollTop = messages.scrollHeight;
+    return msg;
+  }
+
+  function hideEmpty() {
+    if (emptyState) emptyState.style.display = 'none';
+  }
+
+  function useSuggestion(el) {
+    if (!isProcessed) { showToast('Upload and process documents first!', 'error'); return; }
+    input.value = el.textContent;
+    sendMessage();
+  }
+
+  // ── Helpers ────────────────────────────────────────────
+  function updateStatus(type, val) {
+    if (type === 'dot') {
+      statusDot.className = 'status-dot' + (val ? ` ${val}` : '');
+    } else {
+      statusText.textContent = val;
+    }
+  }
+
+  function setProgress(pct) {
+    progress.style.width = pct + '%';
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.className = 'toast', 3000);
+  }
+</script>
+</body>
+</html>
