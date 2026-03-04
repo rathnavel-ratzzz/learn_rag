@@ -10004,3 +10004,9 @@ chroma_db4/f15d71c0-b34d-46d9-a576-d4be9982f1ce/data_level0.bin
 chroma_db4/f15d71c0-b34d-46d9-a576-d4be9982f1ce/header.bin
 chroma_db4/f15d71c0-b34d-46d9-a576-d4be9982f1ce/length.bin
 chroma_db4/f15d71c0-b34d-46d9-a576-d4be9982f1ce/link_lists.bin
+__pycache__/langchain.cpython-312.pyc
+chroma_langchain/chroma.sqlite3
+chroma_langchain/bb220789-ee27-4f06-a3f8-165028717f45/data_level0.bin
+chroma_langchain/bb220789-ee27-4f06-a3f8-165028717f45/header.bin
+chroma_langchain/bb220789-ee27-4f06-a3f8-165028717f45/length.bin
+chroma_langchain/bb220789-ee27-4f06-a3f8-165028717f45/link_lists.bin
