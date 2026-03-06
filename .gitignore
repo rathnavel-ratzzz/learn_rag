@@ -10010,3 +10010,9 @@ chroma_langchain/bb220789-ee27-4f06-a3f8-165028717f45/data_level0.bin
 chroma_langchain/bb220789-ee27-4f06-a3f8-165028717f45/header.bin
 chroma_langchain/bb220789-ee27-4f06-a3f8-165028717f45/length.bin
 chroma_langchain/bb220789-ee27-4f06-a3f8-165028717f45/link_lists.bin
+multi-chroma/chroma.sqlite3
+multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/data_level0.bin
+multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/header.bin
+multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/index_metadata.pickle
+multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/length.bin
+multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/link_lists.bin
