@@ -8,6 +8,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.documents import Document
 from pathlib import Path
+from langchain.agents import create_agent
 # Read Docs --> chunks using the chuking startegy -> embedding using huggig face -> vector Db ->reteriver -> ollama model to give answer based on reteriver
 
 directory_path = './docs'

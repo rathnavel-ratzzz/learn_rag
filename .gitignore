@@ -10016,3 +10016,11 @@ multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/header.bin
 multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/index_metadata.pickle
 multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/length.bin
 multi-chroma/97a00c88-4cb6-4227-8249-84e13bbe506b/link_lists.bin
+chroma_agent/chroma.sqlite3
+chroma_agent/6cd2db9f-efc8-4d8e-b645-127172f592b2/data_level0.bin
+chroma_agent/6cd2db9f-efc8-4d8e-b645-127172f592b2/header.bin
+chroma_agent/6cd2db9f-efc8-4d8e-b645-127172f592b2/length.bin
+chroma_agent/6cd2db9f-efc8-4d8e-b645-127172f592b2/link_lists.bin
+multi-chroma/resume.txt
+resumeanalyser/jd.txt
+resumeanalyser/resume.txt
