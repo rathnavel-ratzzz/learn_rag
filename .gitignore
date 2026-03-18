@@ -10024,3 +10024,9 @@ chroma_agent/6cd2db9f-efc8-4d8e-b645-127172f592b2/link_lists.bin
 multi-chroma/resume.txt
 resumeanalyser/jd.txt
 resumeanalyser/resume.txt
+langraph-article/chroma_langchain/chroma.sqlite3
+langraph-article/chroma_langchain/80b69e74-7ae3-4895-b7ba-2cbcbd089d20/data_level0.bin
+langraph-article/chroma_langchain/80b69e74-7ae3-4895-b7ba-2cbcbd089d20/header.bin
+langraph-article/chroma_langchain/80b69e74-7ae3-4895-b7ba-2cbcbd089d20/length.bin
+langraph-article/chroma_langchain/80b69e74-7ae3-4895-b7ba-2cbcbd089d20/link_lists.bin
+.vscode/settings.json
